@@ -1,0 +1,155 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Table user
+model User {
+  id                            Int              @id @default(autoincrement())
+  email                         String           @unique
+  login                         String           @unique
+  password                      String
+  id42                          Int
+  twoFaAuth                     Boolean          @default(false)
+  firstConn                     Boolean          @default(true)
+  avatar                        String?
+  twoFactorAuthenticationSecret String?          @unique
+  isOnline                      String           @default("OFF")
+  createdAt                     DateTime         @default(now())
+  updatedAt                     DateTime         @updatedAt
+  wins                          Int              @default(0)
+  losses                        Int              @default(0)
+  elo                           Int              @default(500)
+  achievments                   Boolean[]        @default([false, false, false, false, false])
+  match                         Match[]
+  friendshipsFromMe             UserFriendship[] @relation("friendshipsFromMe")
+  friendshipsToMe               UserFriendship[] @relation("friendshipsToMe")
+
+  // channels
+  channelsUser ChannelUser[] @relation("users")
+  channels     Channel[]
+  messages     Message[]
+
+  // Block a user
+  blockList Block[] @relation("blockedUser")
+  blockedBy     Block[]
+}
+
+model Block {
+  id            Int  @id @default(autoincrement())
+  userId        Int
+  blockedUserId Int
+  user          User @relation(fields: [userId], references: [id])
+  blockedUser   User @relation(name: "blockedUser", fields: [blockedUserId], references: [id])
+}
+
+model UserFriendship {
+  id           Int          @id @default(autoincrement())
+  userAId      Int
+  userA        User         @relation(name: "friendshipsFromMe", fields: [userAId], references: [id], onDelete: Cascade)
+  userBId      Int
+  userB        User         @relation(name: "friendshipsToMe", fields: [userBId], references: [id], onDelete: Cascade)
+  friendStatus FriendStatus
+}
+
+enum FriendStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+// Table match. Pour l'instant on l'utilise pas
+model Match {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  winnerScore Int      @default(0)
+  losserScore Int      @default(0)
+  winner      String?
+  losser      String?
+  player1     String
+  player2     String
+  players     User[]
+  gameStatus  GameStatus
+  gameType    GameType
+}
+
+// Table Channel
+model Channel {
+  id            Int           @id @default(autoincrement())
+  name          String        @unique
+  isPrivate     Boolean       @default(false)
+  isProtected   Boolean       @default(false)
+  password      String?
+  ownerId       Int
+  owner         User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  messages      Message[]
+  users         ChannelUser[]
+  channelStatus ChannelStatus
+}
+
+model Message {
+  id        Int           @id @default(autoincrement())
+  content   String
+  senderId  Int
+  sender    User          @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  channelId Int
+  chat      Channel       @relation(fields: [channelId], references: [id])
+  createdAt DateTime      @default(now())
+  msgStatus MessageStatus
+}
+
+model ChannelUser {
+  id        Int             @id @default(autoincrement())
+  userId    Int
+  user      User            @relation(name: "users", fields: [userId], references: [id])
+  channelId Int
+  channel   Channel         @relation(fields: [channelId], references: [id])
+  banUntil  DateTime?
+  muteUntil DateTime?
+  isKicked  Boolean         @default(false)
+  userRole  ChannelUserRole
+
+  @@unique([userId, channelId])
+}
+
+enum ChannelUserRole {
+  OWNER
+  ADMIN
+  NORMAL
+  MUTED
+  BANNED
+}
+
+enum ChannelStatus {
+  PUBLIC
+  PRIVATE
+  PROTECTED
+  PRIVATE_MSG
+}
+
+enum MessageStatus {
+  NORMAL
+  JOIN
+  KICK
+  QUIT
+  ADDADMIN
+  REMOVEADMIN
+}
+
+enum GameStatus {
+  WAITING
+  INPROGRESS
+  FINISH
+}
+
+enum GameType {
+  CLASSIC
+  FUNMODE
+}

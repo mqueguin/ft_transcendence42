@@ -1,0 +1,45 @@
+{
+  "name": "ft_transcendence",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.2.1",
+    "@fortawesome/free-solid-svg-icons": "^6.2.1",
+    "@fortawesome/vue-fontawesome": "^3.0.3",
+    "@types/luxon": "^2.3.1",
+    "bulma": "^0.9.4",
+    "core-js": "^3.27.1",
+    "lodash": "^4.17.21",
+    "luxon": "^2.3.1",
+    "marked": "^4.2.12",
+    "socket.io-client": "^4.5.4",
+    "vue": "^3.2.45",
+    "vue-class-component": "^8.0.0-0",
+    "vue-property-decorator": "^9.1.2",
+    "vue-router": "^4.1.6",
+    "vue-toastification": "^2.0.0-rc.5",
+    "vue3-cookies": "^1.0.6"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.191",
+    "@vue/cli-plugin-babel": "~5.0.8",
+    "@vue/cli-plugin-router": "~5.0.8",
+    "@vue/cli-plugin-typescript": "~5.0.8",
+    "@vue/cli-service": "~5.0.8",
+    "pinia": "^2.0.29",
+    "sass": "^1.57.1",
+    "sass-loader": "^13.2.0",
+    "typescript": "~4.9.4"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie 11"
+  ]
+}

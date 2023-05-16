@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - /frontend/app/node_modules
+    ports:
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+    depends_on:
+      - backend
+      
+  backend:
+    container_name: backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - /backend/app/node_modules
+    ports:
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
+      - "5555:5555"
+      - "${SOCKET_FRIENDS}:${SOCKET_FRIENDS}"
+      - "${SOCKET_PONG}:${SOCKET_PONG}"
+      - "${SOCKET_CHAT}:${SOCKET_CHAT}"
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  db:
+    container_name: database
+    image: postgres:15.1-bullseye
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      PGDATA: /var/lib/postgresql/data
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
